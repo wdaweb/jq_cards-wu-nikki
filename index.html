@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./卡片/RepetitionScrolling.ttf">
   <title>Document</title>
   <style>
     body {
@@ -14,6 +15,75 @@
 
     }
 
+
+    .bg {
+      width: 100vw;
+      height: 100vh;
+      flex: auto;
+      overflow: hidden;
+      background: url(./卡片/圖.jpg)no-repeat;
+      background-size: cover;
+      background-position: top right;
+    }
+
+    .start {
+      width: 90vw;
+      height: 90vh;
+      margin-left: 1%;
+      margin-top: 1%;
+      border-radius: 40px;
+      background-color: rgba(143, 185, 237, 0.9);
+      position: relative;
+    }
+
+    #button {
+
+      text-align: center;
+      width: 12%;
+      height: 8%;
+      border-radius: 20px;
+      border: 5px solid rgb(240, 231, 106);
+      background-color: rgb(51, 106, 143);
+      color: yellow;
+      font-size: 40px;
+      position: absolute;
+      top: 50%;
+      left: 42%;
+    }
+
+    #game {
+      width: 50vw;
+      height: 80vh;
+      margin-left: 3%;
+      margin-top: 3%;
+      border-radius: 40px;
+      background-color: rgba(255, 255, 255, 0.5);
+
+    }
+
+    /* 自訂義字型，需要字體檔案 */
+    @font-face {
+      /* 自訂名稱，為 src 設定一個字型家族名稱 */
+      font-family: 'myfont';
+      src: url('serif_led_board-7.ttf'), url('RepetitionScrolling.ttf')
+    }
+
+    .font-set {
+      font-family: 'myfont';
+
+    }
+
+    .card {
+      width: 20%;
+      height: 20%;
+      border-radius: 15px;
+      position: relative;
+      float: left;
+      transition: transform 1s;
+      transform-style: preserve-3d;
+    }
+
+    /* 
     .card {
       width: 20%;
       height: 20%;
@@ -23,12 +93,10 @@
       margin: 10px;
       transition: transform 1s;
       /* 設定子元素在 3D 空間內 */
-      transform-style: preserve-3d;
+    /* transform-style: preserve-3d;
+    } */
 
-    }
-
-
-    .card-front {
+    /* .card-front {
       width: 100%;
       height: 100%;
       background-image: url(./撲克牌/1H.jpg);
@@ -37,10 +105,10 @@
       background-position: center;
       position: absolute;
       /* 設定隱藏背面 */
-      backface-visibility: hidden;
-    }
+    /* backface-visibility: hidden;
+    } */
 
-    .card-back {
+    /* .card-back {
       width: 100%;
       height: 100%;
       background-image: url(./卡片/卡牌背面4.jpg);
@@ -50,86 +118,81 @@
       position: absolute;
       transform: rotateY(180deg);
       /* 設定隱藏背面 */
-      backface-visibility: hidden;
-    }
+    /* backface-visibility: hidden;
+    } */
 
-    .card-close {
+    /* .card-close {
       transform: rotateY(180deg);
-    }
-
-    #game {
-      width: 80vw;
-      height: 50vh;
-      margin: auto;
-      margin-top: 3%;
-      border-radius: 40px;
-      background-color: rgba(255, 255, 255, 0.5);
-
-    }
+    } */
   </style>
 </head>
 
 <body>
-  <div></div>
-  <div id="game">
+  <div class="bg">
+    <div class="start">
+      <div id="button" class="font-set">start</div>
+    </div>
+    <div id="game">
 
+    </div>
   </div>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js'
     integrity='sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=='
     crossorigin='anonymous'></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+
     // 產生卡片
-    for (let i = 0; i < 16; i++) {
-      $('#game').append(`
-        <div class="card card-close">
-          <div class="card-front"></div>
-          <div class="card-back"></div>
-        </div>
-      `)
-    }
-    for (let i = 0; i < $('.card').length; i++) {
-      // 決定數字
-      const num = i % ($('.card').length / 2) + 1
-      $('.card').eq(i).find('.card-front').css('background-image', `url(./撲克牌/${num}H.jpg)`)
-      $('.card').eq(i).attr('data-num', num)
+    // for (let i = 0; i < 16; i++) {
+    //   $('#game').append(`
+    //     <div class="card card-close">
+    //       <div class="card-front"></div>
+    //       <div class="card-back"></div>
+    //     </div>
+    //   `)
+    // }
+    // for (let i = 0; i < $('.card').length; i++) {
+    //   // 決定數字
+    //   const num = i % ($('.card').length / 2) + 1
+    //   $('.card').eq(i).find('.card-front').css('background-image', `url(./撲克牌/${num}H.jpg)`)
+    //   $('.card').eq(i).attr('data-num', num)
 
-      // 打散
-      const target = Math.round(Math.random() * ($('.card').length - 1))
-      $('.card').eq(target).insertAfter($('.card').eq(i))
-    }
+    //   // 打散
+    //   const target = Math.round(Math.random() * ($('.card').length - 1))
+    //   $('.card').eq(target).insertAfter($('.card').eq(i))
+    // }
 
-    $('#game').on('click', '.card', function () {
-      // 最多一次翻兩張，且這張牌還沒翻開
-      if ($('.card:not(.card-close)').length < 2 &&
-        $(this).hasClass('card-close') &&
-        !$(this).hasClass('card-ok')
-      ) {
-        $(this).removeClass('card-close')
-      }
+    // $('#game').on('click', '.card', function () {
+    //   // 最多一次翻兩張，且這張牌還沒翻開
+    //   if ($('.card:not(.card-close)').length < 2 &&
+    //     $(this).hasClass('card-close') &&
+    //     !$(this).hasClass('card-ok')
+    //   ) {
+    //     $(this).removeClass('card-close')
+    //   }
 
-      // 如果翻兩張了
-      if ($('.card:not(.card-close)').length === 2) {
-        // 如果數字一樣
-        if ($('.card:not(.card-close)').eq(0).attr('data-num') === $('.card:not(.card-close)').eq(1).attr('data-num')) {
-          // 用 card-ok 標記已完成
-          $('.card:not(.card-close)').addClass('card-ok')
-          $('.card:not(.card-close)').fadeTo(1000, 0)
-        }
+    //   // 如果翻兩張了
+    //   if ($('.card:not(.card-close)').length === 2) {
+    //     // 如果數字一樣
+    //     if ($('.card:not(.card-close)').eq(0).attr('data-num') === $('.card:not(.card-close)').eq(1).attr('data-num')) {
+    //       // 用 card-ok 標記已完成
+    //       $('.card:not(.card-close)').addClass('card-ok')
+    //       $('.card:not(.card-close)').fadeTo(1000, 0)
+    //     }
 
-        // 不管數字一不一樣都將卡片翻回來
-        setTimeout(() => {
-          $('.card:not(.card-close)').addClass('card-close')
-          if ($('.card-ok').length === $('.card').length) {
-            Swal.fire({
-              icon: 'success',
-              title: '恭喜',
-              text: '恭喜過關'
-            })
-          }
-        }, 1000)
-      }
-    })
+    //     // 不管數字一不一樣都將卡片翻回來
+    //     setTimeout(() => {
+    //       $('.card:not(.card-close)').addClass('card-close')
+    //       if ($('.card-ok').length === $('.card').length) {
+    //         Swal.fire({
+    //           icon: 'success',
+    //           title: '恭喜',
+    //           text: '恭喜過關'
+    //         })
+    //       }
+    //     }, 1000)
+    //   }
+    // })
   </script>
 </body>
 
