@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./卡片/RepetitionScrolling.ttf">
-  <title>Document</title>
+  <title>數碼寶貝</title>
   <style>
     body {
       margin: 0;
@@ -40,15 +40,106 @@
 
       text-align: center;
       width: 12%;
-      height: 8%;
+      height: 10%;
       border-radius: 20px;
-      border: 5px solid rgb(240, 231, 106);
+      line-height: 50px;
+      border: 5px outset rgb(240, 231, 106);
       background-color: rgb(51, 106, 143);
-      color: yellow;
-      font-size: 40px;
+      color: rgb(253, 253, 28);
+      font-size: 50px;
       position: absolute;
       top: 50%;
       left: 42%;
+    }
+
+
+
+    .name {
+      position: absolute;
+      right: 25%;
+      font-size: 30px;
+      color: rgb(253, 253, 28);
+    }
+
+    .time {
+      position: absolute;
+      right: 5%;
+      font-size: 30px;
+      color: rgb(253, 253, 28);
+    }
+
+    .useTime {
+      position: absolute;
+      top: 10%;
+      right: 5%;
+      font-size: 30px;
+      color: rgb(253, 253, 28);
+    }
+
+
+
+    /* 自訂義字型，需要字體檔案 */
+    @font-face {
+      /* 自訂名稱，為 src 設定一個字型家族名稱 */
+      font-family: 'myfont';
+      src: url('Pixel.ttf'), url('serif_led_board-7.ttf')
+    }
+
+    .font-set {
+      font-family: 'myfont';
+
+    }
+
+    .card {
+      width: 80px;
+      height: 140px;
+      border-radius: 15px;
+      position: relative;
+      float: left;
+      margin: 20px;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+    }
+
+
+    /* .card {
+      width: 20%;
+      height: 20%;
+      border-radius: 5%;
+      position: relative;
+      float: left;
+      margin: 10px;
+      transition: transform 1s;
+      設定子元素在 3D 空間內 transform-style: preserve-3d;
+    } */
+
+    .card-front {
+      width: 100%;
+      height: 100%;
+      background-image: url(./7張卡片/1a.jpg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: absolute;
+      /* 設定隱藏背面 */
+      backface-visibility: hidden;
+    }
+
+    .card-back {
+      width: 100%;
+      height: 100%;
+      background-image: url(./卡片/卡牌背面4.jpg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: right;
+      position: absolute;
+      transform: rotateY(180deg);
+      /* 設定隱藏背面  */
+      backface-visibility: hidden;
+    }
+
+    .card-close {
+      transform: rotateY(180deg);
     }
 
     #game {
@@ -60,77 +151,18 @@
       background-color: rgba(255, 255, 255, 0.5);
 
     }
-
-    /* 自訂義字型，需要字體檔案 */
-    @font-face {
-      /* 自訂名稱，為 src 設定一個字型家族名稱 */
-      font-family: 'myfont';
-      src: url('serif_led_board-7.ttf'), url('RepetitionScrolling.ttf')
-    }
-
-    .font-set {
-      font-family: 'myfont';
-
-    }
-
-    .card {
-      width: 20%;
-      height: 20%;
-      border-radius: 15px;
-      position: relative;
-      float: left;
-      transition: transform 1s;
-      transform-style: preserve-3d;
-    }
-
-    /* 
-    .card {
-      width: 20%;
-      height: 20%;
-      border-radius: 5%;
-      position: relative;
-      float: left;
-      margin: 10px;
-      transition: transform 1s;
-      /* 設定子元素在 3D 空間內 */
-    /* transform-style: preserve-3d;
-    } */
-
-    /* .card-front {
-      width: 100%;
-      height: 100%;
-      background-image: url(./撲克牌/1H.jpg);
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      position: absolute;
-      /* 設定隱藏背面 */
-    /* backface-visibility: hidden;
-    } */
-
-    /* .card-back {
-      width: 100%;
-      height: 100%;
-      background-image: url(./卡片/卡牌背面4.jpg);
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: right;
-      position: absolute;
-      transform: rotateY(180deg);
-      /* 設定隱藏背面 */
-    /* backface-visibility: hidden;
-    } */
-
-    /* .card-close {
-      transform: rotateY(180deg);
-    } */
   </style>
 </head>
 
 <body>
   <div class="bg">
+    <div class="second">
+      <p class="font-set name">最快破台:<span id="text-quickname"></span></p>
+      <p class="font-set time">最快時間:<span id="text-quicksecond">0</span></p>
+      <p class="font-set useTime">使用時間:<span id="text-second">0</span></p>
+    </div>
     <div class="start">
-      <div id="button" class="font-set">start</div>
+      <button id="button" class="font-set">START</button>
     </div>
     <div id="game">
 
@@ -141,58 +173,43 @@
     crossorigin='anonymous'></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    $('.name').hide()
+    $('.time').hide()
+    $('.useTime').hide()
 
-    // 產生卡片
-    // for (let i = 0; i < 16; i++) {
-    //   $('#game').append(`
-    //     <div class="card card-close">
-    //       <div class="card-front"></div>
-    //       <div class="card-back"></div>
-    //     </div>
-    //   `)
-    // }
-    // for (let i = 0; i < $('.card').length; i++) {
-    //   // 決定數字
-    //   const num = i % ($('.card').length / 2) + 1
-    //   $('.card').eq(i).find('.card-front').css('background-image', `url(./撲克牌/${num}H.jpg)`)
-    //   $('.card').eq(i).attr('data-num', num)
+    let count = 0
+    let timer = 0
+    const quicksecond = localStorage.msgame ? JSON.parse(localStorage.msgame) : { name: '', second: 0 }
+    $('#text-quickname').text(quicksecond.name)
+    $('#text-quicksecond').text(quicksecond.second)
 
-    //   // 打散
-    //   const target = Math.round(Math.random() * ($('.card').length - 1))
-    //   $('.card').eq(target).insertAfter($('.card').eq(i))
-    // }
+    $('#button').click(function () {
+      $('.start').hide()
+      $('.name').show()
+      $('.time').show()
+      $('.useTime').show()
 
-    // $('#game').on('click', '.card', function () {
-    //   // 最多一次翻兩張，且這張牌還沒翻開
-    //   if ($('.card:not(.card-close)').length < 2 &&
-    //     $(this).hasClass('card-close') &&
-    //     !$(this).hasClass('card-ok')
-    //   ) {
-    //     $(this).removeClass('card-close')
-    //   }
+      count = 0
+      $('#text-second').text(count)
 
-    //   // 如果翻兩張了
-    //   if ($('.card:not(.card-close)').length === 2) {
-    //     // 如果數字一樣
-    //     if ($('.card:not(.card-close)').eq(0).attr('data-num') === $('.card:not(.card-close)').eq(1).attr('data-num')) {
-    //       // 用 card-ok 標記已完成
-    //       $('.card:not(.card-close)').addClass('card-ok')
-    //       $('.card:not(.card-close)').fadeTo(1000, 0)
-    //     }
+      timer = setInterval(function () {
+        count++
+        $('#text-second').text(count)
 
-    //     // 不管數字一不一樣都將卡片翻回來
-    //     setTimeout(() => {
-    //       $('.card:not(.card-close)').addClass('card-close')
-    //       if ($('.card-ok').length === $('.card').length) {
-    //         Swal.fire({
-    //           icon: 'success',
-    //           title: '恭喜',
-    //           text: '恭喜過關'
-    //         })
-    //       }
-    //     }, 1000)
-    //   }
-    // })
+        // 產生卡片
+        for (let i = 0; i < 14; i++) {
+          $('#game').append(`
+            <div class="card card-close">
+              <div class="card-front"></div>
+              <div class="card-back"></div>
+            </div>
+          `)
+        }
+
+
+      })
+    })
+
   </script>
 </body>
 
