@@ -41,7 +41,7 @@
       line-height: 80px;
       color: rgb(255, 255, 255);
       position: absolute;
-      top: 20%;
+      top: 15%;
       left: 22%;
     }
 
@@ -202,16 +202,19 @@
     let count = 0
     let timer = 0
     let level = 1
-
-    $('#text-level').text(level)
-    const quicksecond = localStorage.msgame ? JSON.parse(localStorage.msgame) : { name: '', second: 0, level: 1 }
-    $('#quickname').text(quicksecond.name)
-    $('#quicksecond').text(quicksecond.second)
-    $('#text-level').text(quicksecond.level)
+    let cardNum = 14
+    let quicksecond
+    const getLocalstorege = () => {
+      quicksecond = localStorage.msgame ? JSON.parse(localStorage.msgame) : { name: '' }
+      $('#quickname').text(quicksecond.name)
+      $('#quicksecond').text(quicksecond.second)
+    }
+    getLocalstorege()
 
     // 產生卡片
     function haveCard() {
-      for (let i = 0; i < 14; i++) {
+      if (level === 4) cardNum = 16
+      for (let i = 0; i < cardNum; i++) {
         $('#game').append(`
             <div class="card card-close">
               <div class="card-front"></div>
@@ -220,9 +223,10 @@
           `)
       }
       for (let i = 0; i < $('.card').length; i++) {
+        const levelWord = level === 1 ? "a" : level === 2 ? "b" : level === 3 ? "c" : "d"
         const num = i % ($('.card').length / 2) + 1
         $('.card').eq(i).find('.card-front').css
-          ('background-image', `url(./7張卡片/${num}a.jpg)`)
+          ('background-image', `url(./7張卡片/${num + levelWord}.jpg)`)
         // 判斷卡片是否相同
         $('.card').eq(i).attr('data-num', num)
 
@@ -232,9 +236,9 @@
 
       }
     }
-
     // 卡片重置
-    function repeatCard() {
+    function resetCard() {
+
       $('.name').hide()
       $('.time').hide()
       $('.level').hide()
@@ -244,29 +248,24 @@
       $('.card').css('opacity', '')
       $('.card').removeClass('card-ok')
       $('.card,.card-close').remove()
-
     }
 
     // 按開始
     $('#button').click(function () {
+      resetCard()
       $('.start').hide()
       $('.name').show()
       $('.time').show()
+      $('#text-level').text(level)
       $('.level').show()
       $('.useTime').show()
-
       // 呼叫洗牌
       haveCard()
-
-      // count = 0
-      // $('#text-second').text(count)
 
       timer = setInterval(function () {
         count++
         $('#text-second').text(count)
-
-      })
-
+      }, 1000)
     })
 
     //點選卡片
@@ -287,25 +286,57 @@
           $('.card:not(.card-close)').addClass('card-ok')
           $('.card:not(.card-close)').fadeTo(1000, 0)
         }
-
-
-        // 不管數字一不一樣都將卡片翻回來
-        setTimeout(() => {
+        // 格一秒，不然不好看
+        setTimeout(async () => {
+          // 不管數字一不一樣都將卡片翻回來
           $('.card:not(.card-close)').addClass('card-close')
-
+          //全部卡片ok就結束level 
           if ($('.card-ok').length === $('.card').length) {
-            //結束level 
             clearInterval(timer)
             // 
-            Swal.fire({
-              icon: 'success',
-              title: '恭喜',
-              text: `恭喜過關，第${level}回合累積花費${count}秒`
-            }).then(result => {
-              repeatCard()
-              level++
-            })
+
+            // 玩到第4關 秒數小於最高紀錄時填寫
+
+            if (level === 4) {
+              if (count < quicksecond.second || quicksecond.second === undefined) {
+                await Swal.fire({
+                  icon: 'info',
+                  title: '最高分！留下你的名字吧！',
+                  html: `累計時間為 ${count} 秒`,
+                  inputPlaceholder: '輸入名稱',
+                  input: 'text',
+                  inputAttributes: {
+                    required: true
+                  },
+                  validationMessage: '名稱必填'
+                }).then(result => {
+                  localStorage.msgame = JSON.stringify({ name: result.value, second: count })
+                  resetInfo()
+                })
+              } else {
+                Swal.fire({
+                  icon: 'success',
+                  title: '恭喜',
+                  text: `恭喜全過關，共花費${count}秒`
+                }).then(() => {
+                  resetInfo()
+                })
+              }
+
+            } else {
+
+              Swal.fire({
+                icon: 'success',
+                title: '恭喜',
+                text: `恭喜過關，第${level}回合累積花費${count}秒`
+              }).then(result => {
+                resetCard()
+                level++
+              })
+            }
           }
+
+
         }, 1000)
       }
 
@@ -314,7 +345,13 @@
     })
 
 
-
+    const resetInfo = () => {
+      resetCard()
+      count = 0
+      level = 1
+      $('#text-second').text(count)
+      getLocalstorege()
+    }
 
   </script>
 </body>
